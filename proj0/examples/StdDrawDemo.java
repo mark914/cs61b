@@ -22,7 +22,7 @@ public class StdDrawDemo {
 		StdDraw.clear();
 
 		/* Stamps three copies of advice.png in a triangular pattern. */
-		StdDraw.picture(0, 75, imageToDraw);
+		StdDraw.picture(0, 75, imageToDraw, 200,200);
 		StdDraw.picture(-75, -75, imageToDraw);
 		StdDraw.picture(75, -75, imageToDraw);
 
@@ -97,7 +97,7 @@ public class StdDrawDemo {
 	public static void main(String[] args) {
 		
 		drawThree();
-		drawRandom();
-		drawZoom();
+		// drawRandom();
+		// drawZoom();
 	}
 } 

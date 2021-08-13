@@ -71,11 +71,11 @@ public class Planet {
     }
 
     public void draw() {
-        String fileName = "img/"+this.imgFileName;
+        String fileName = "images/"+this.imgFileName;
         StdDraw.picture(this.xxPos, this.yyPos, fileName);	
 
     }
-
+    
 
 
 }
