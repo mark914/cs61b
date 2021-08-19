@@ -28,6 +28,16 @@ public class ArithmeticTest {
         assertEquals(0, Arithmetic.sum(6, -6));
     }
 
+    /** Performs a test to see if the reverse method is correct */
+    @Test
+    public void testReverse() {
+        
+    }
+
+
+
+
+
     /* Run the unit tests in this file. */
     public static void main(String... args) {        
         jh61b.junit.TestRunner.runTests("all", ArithmeticTest.class);

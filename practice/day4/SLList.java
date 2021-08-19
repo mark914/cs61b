@@ -1,164 +1,129 @@
-import java.awt.desktop.ScreenSleepEvent;
+/* Represent a list of stuff, where all the "list" work is delegated
+ * to a naked recursive data structure. */
 
-/** An SLList is a list of integers, which hides the terrible truth
- * of th nakedness within.
- */
-public class SLList {
-    /* recursive structure. */
-    private static class IntNode {
-        public int item;
-        public IntNode next;
+public class SLList<Blorp> implements List61B<Blorp> {
+    public class Node {
+        public Blorp item;     /* Equivalent of first */
+        public Node next; /* Equivalent of rest */
 
-        public IntNode(int i, IntNode n) {
+        public Node(Blorp i, Node h) {
             item = i;
-            next = n;
+            next = h;
         }
     }
 
-    /* the first item  (if it exits) is at sentinel.next.*/
-    private IntNode sentinel;
+    private Node sentinel;
     private int size;
 
-    /** Create an empty SLList. */
+    /** Creates an empty list. */
     public SLList() {
-        sentinel = new IntNode(55, null);
         size = 0;
+        sentinel = new Node(null, null);
     }
 
-    public SLList(int x) {
-        sentinel = new IntNode(55, null);
-        sentinel.next = new IntNode(x, null);
+    public SLList(Blorp x) {
         size = 1;
+        sentinel = new Node(null, null);
+        sentinel.next = new Node(x, null);
     }
 
-    /** Adds x to the front of the list. */
-    public void addFirst(int x) {
-        sentinel.next = new IntNode(x, sentinel.next);
-        size = size + 1;
+    /** Adds an item of the front. */
+    public void addFirst(Blorp x) {
+        Node oldFrontNode = sentinel.next;
+        Node newNode = new Node(x, oldFrontNode);
+        sentinel.next = newNode;
+        size += 1;
     }
 
-    /** Returns the first item in the list. */
-    public int getFirst() {
+    /** Gets the front item of the list. */
+    public Blorp getFirst() {
         return sentinel.next.item;
     }
 
-    public int getHelper(int n, IntNode p) {
-        if (n == 0){
-            return p.item;
-        }else {
-            return getHelper(n-1, p.next);
-        }
-    }
-    public int get(int n) {
-        return getHelper( n, sentinel.next);
-    }
-
-    /** Adds x to the end of the list. */
-
-    public void addLast(int x) {
+    /** Puts an item at the back of the list. */
+    public void addLast(Blorp x) {
         size += 1;
-        IntNode p = sentinel;
-        while(p.next != null) {
+
+        Node p = sentinel;
+
+        /* Move p until it reaches the end. */
+        while (p.next != null) {
             p = p.next;
         }
 
-        p.next = new IntNode(x, null);
+        p.next = new Node(x, null);
     }
 
-    /** get the last */
+    /** Returns the back node of our list. */
+    private Node getLastNode() {
+        Node p = sentinel;
 
-    /** Returns the size of the list. */
+        /* Move p until it reaches the end. */
+        while (p.next != null) {
+            p = p.next;
+        }
+        return p;
+    }
+
+    /** Returns last item */
+    public Blorp getLast() {
+        Node back = getLastNode();
+        return back.item;
+    }
+
+    /** Deletes and returns last item. */
+    public Blorp removeLast() {
+        Node back = getLastNode();
+        if (back == sentinel) {
+            return null;
+        }
+
+        size = size - 1;
+        Node p = sentinel;
+
+        while (p.next != back) {
+            p = p.next;
+        }
+        p.next = null;
+        return back.item;
+    }
+
     public int size() {
-
         return size;
     }
 
-    /** 令 p = sentinel.next
-     * 如果对p赋予一个新的值，p = new IntNote(20,null),那么原来的链接就会被打断，对p进行改变不会影响
-     * 原来的值（这里的等式都支持GRoE）
-     * p = p.next，符合GRoE，相当于把next中的地址赋值给p
-     * 如果令p.next = new IntNote(20, null)，那么相当于把后面new出来的地址赋值给p.next。
-     * 这时候p也会随之发生改变。
-     * 你的目的是让地址里面的东西发生改变，而不是让地址发生改变。所以一定要使用p.next = new来进行改变。
-     */
-    public void insert(int item, int position) {
-        if (size == 0) {
-            addFirst(item);
+    /** Gets the positionth item of the list. */
+    public Blorp get(int position) {
+        if (position == 0) {
+            return getFirst();
         }
-        IntNode p = sentinel.next;
-        while (position != 1) {
+        Node currentNode = sentinel.next.next;
+        while (position > 1 && currentNode.next != null) {
             position -= 1;
-            p = p.next;
+            currentNode = currentNode.next;
         }
 
-        p.next = new IntNode(item, p.next);
-        size += 1;
+        return currentNode.item;
     }
 
-    public void reverse() {
-        sentinel.next = reverseRecursiveHelper(sentinel.next);
-    }
-    public IntNode reverseRecursiveHelper(IntNode front) {
-        if (front == null || front.next == null) {
-            return front;
-        }else {
-            IntNode reversed = reverseRecursiveHelper(front.next);
-            front.next.next = front;
-            front.next = null;
-            return reversed;
-        }
-    }
-
-    public void reverseIterative() {
-        if (sentinel.next == null || sentinel.next.next == null) {
+    /** Inserts item into given position.
+     * Code from discussion #3 */
+    public void insert(Blorp item, int position) {
+        if (sentinel.next == null || position == 0) {
+            addFirst(item);
             return;
         }
-        IntNode first =sentinel.next;
-        IntNode ptr = first.next;
-        sentinel.next.next = null;
 
-        while (ptr != null) {
-            IntNode temp = ptr.next;
-            ptr.next = first;
-            first = ptr;
-            ptr = temp;
-        }
-    }
-
-
-    public void reverse2() {
-        if (sentinel.next == null || sentinel.next.next == null) {
-            return;
-        }
-        IntNode first = sentinel.next;
-        IntNode ptr = first.next;
-        first.next = null;
-        while (ptr != null) {
-            IntNode temp = ptr.next;
-            ptr.next = first;
-            first = ptr;
-            ptr = temp;
+        Node currentNode = sentinel.next.next;
+        while (position > 1 && currentNode.next != null) {
+            position -= 1;
+            currentNode = currentNode.next;
         }
 
-
+        Node newNode = new Node(item, currentNode.next);
+        currentNode.next = newNode;
     }
 
-    public static void main(String[] args){
-        /* Creates a list of one integer, namely 10 */
-        SLList L = new SLList();
-        L.addLast(20);
-        L.addLast(10);
-        L.addLast(5);
-        L.addLast(0);
-        System.out.println(L.size());
-        System.out.println(L.get(1));
-        L.reverseIterative();
+    /** TODO: Add a print method that overrides List61B's inefficient print method. */
 
-    }
-
-
-
-
-
-
-}
+} 
